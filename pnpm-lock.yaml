@@ -35,6 +35,9 @@ importers:
       pdfjs-dist:
         specifier: ^5.0.0
         version: 5.7.284
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
       zod:
         specifier: ^3.25.0
         version: 3.25.76
@@ -51,9 +54,6 @@ importers:
       '@types/node':
         specifier: ^22.10.0
         version: 22.19.21
-      tsx:
-        specifier: ^4.19.0
-        version: 4.22.4
       typescript:
         specifier: ^5.7.0
         version: 5.9.3
