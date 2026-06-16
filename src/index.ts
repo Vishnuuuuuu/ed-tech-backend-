@@ -9,11 +9,25 @@ async function main() {
 
   const app = express();
 
-  // Allow the frontend origin; permit common dev ports (3000/3001 fallback).
-  const corsOrigin = process.env.CORS_ORIGIN ?? "http://localhost:3000";
+  // Allow the configured frontend origin(s) plus local dev ports. CORS_ORIGIN may
+  // be a comma-separated list; trailing slashes are tolerated (the browser's
+  // Origin header never has one, so we normalize both sides).
+  const stripSlash = (s: string) => s.trim().replace(/\/+$/, "");
+  const allowedOrigins = Array.from(
+    new Set([
+      ...(process.env.CORS_ORIGIN ?? "").split(",").map(stripSlash).filter(Boolean),
+      "http://localhost:3000",
+      "http://localhost:3001",
+    ]),
+  );
   app.use(
     cors({
-      origin: [corsOrigin, "http://localhost:3000", "http://localhost:3001"],
+      origin: (origin, cb) => {
+        // Allow same-origin / non-browser requests (no Origin header) and any
+        // explicitly-allowed origin.
+        if (!origin || allowedOrigins.includes(stripSlash(origin))) cb(null, true);
+        else cb(new Error(`Origin not allowed by CORS: ${origin}`));
+      },
     }),
   );
   app.use(express.json());
