@@ -165,6 +165,19 @@ export const GetMapResponseSchema = z.object({
 });
 export type GetMapResponseT = z.infer<typeof GetMapResponseSchema>;
 
+/** GET /maps -> { maps } : recent maps for the current user (newest first). */
+export const MapSummarySchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  updatedAt: z.string(),
+});
+export type MapSummaryT = z.infer<typeof MapSummarySchema>;
+
+export const ListMapsResponseSchema = z.object({
+  maps: z.array(MapSummarySchema),
+});
+export type ListMapsResponseT = z.infer<typeof ListMapsResponseSchema>;
+
 /** PUT /maps/:id { title, positions, customLabels } -> { ok } (debounced autosave) */
 export const UpdateMapRequestSchema = z.object({
   title: z.string(),

@@ -4,6 +4,7 @@ import {
   UpdateMapRequestSchema,
   type GetMapResponseT,
   type JobStatusResponseT,
+  type ListMapsResponseT,
 } from "#shared";
 import { getStore, PLACEHOLDER_USER_ID } from "../store/index.js";
 import { processDocument } from "../services/jobs/worker.js";
@@ -60,6 +61,19 @@ apiRouter.get("/jobs/:id", async (req, res) => {
     finishedAt: job.finishedAt,
     error: job.error,
     mapId: job.mapId,
+  };
+  res.json(body);
+});
+
+// GET /maps — recent maps for the placeholder user (newest first).
+apiRouter.get("/maps", async (_req, res) => {
+  const maps = await getStore().listMaps(PLACEHOLDER_USER_ID);
+  const body: ListMapsResponseT = {
+    maps: maps.map((m) => ({
+      id: m.id,
+      title: m.title,
+      updatedAt: new Date(m.updatedAt).toISOString(),
+    })),
   };
   res.json(body);
 });

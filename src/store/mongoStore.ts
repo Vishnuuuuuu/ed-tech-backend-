@@ -92,6 +92,14 @@ export async function createMongoStore(uri: string): Promise<Store> {
       return map ? rename<MapRec>(map) : null;
     },
 
+    async listMaps(userId) {
+      const docs = (await MapModel.find({ userId })
+        .sort({ updatedAt: -1 })
+        .select("_id title updatedAt")
+        .lean()) as unknown as Array<{ _id: string; title: string; updatedAt: number }>;
+      return docs.map((d) => ({ id: d._id, title: d.title, updatedAt: d.updatedAt }));
+    },
+
     async updateMap(id, patch) {
       const map = await MapModel.findByIdAndUpdate(
         id,

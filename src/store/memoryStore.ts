@@ -45,6 +45,13 @@ export function createMemoryStore(): Store {
       return maps.get(id) ?? null;
     },
 
+    async listMaps(userId) {
+      return [...maps.values()]
+        .filter((m) => m.userId === userId)
+        .sort((a, b) => b.updatedAt - a.updatedAt)
+        .map((m) => ({ id: m.id, title: m.title, updatedAt: m.updatedAt }));
+    },
+
     async updateMap(id, patch) {
       const map = maps.get(id);
       if (!map) return null;

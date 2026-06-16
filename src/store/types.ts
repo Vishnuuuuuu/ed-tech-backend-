@@ -37,6 +37,13 @@ export interface MapRec {
   updatedAt: number;
 }
 
+/** Lightweight map listing for the "Recents" UI. */
+export interface MapSummary {
+  id: string;
+  title: string;
+  updatedAt: number;
+}
+
 export interface Store {
   kind: "mongo" | "memory";
   createDocument(rec: Omit<DocumentRec, "id" | "createdAt">): Promise<DocumentRec>;
@@ -45,6 +52,7 @@ export interface Store {
   updateJob(id: string, patch: Partial<JobRec>): Promise<void>;
   saveMap(rec: Omit<MapRec, "id" | "updatedAt">): Promise<MapRec>;
   getMap(id: string): Promise<MapRec | null>;
+  listMaps(userId: string): Promise<MapSummary[]>;
   updateMap(
     id: string,
     patch: Pick<MapRec, "title" | "positions" | "customLabels">,
