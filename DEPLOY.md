@@ -27,15 +27,21 @@ AUTH_SECRET=                          # unused for now (auth is a later phase)
 Without `MONGODB_URI` the server runs an in-memory store (fine for a smoke test, but
 data is lost on restart).
 
-## 4. Run (pm2)
-The production process runs via `tsx` (the vendored TypeScript `#shared` module is
-resolved at runtime — no separate build step needed):
+## 4. Run (pm2 via deploy.sh)
+A `deploy.sh` script pulls, installs, and (re)starts the app under pm2 using
+`ecosystem.config.cjs`. The process runs via `tsx` (the vendored TypeScript `#shared`
+module is resolved at runtime — no separate build step needed):
 ```bash
-pm2 start "pnpm start" --name slp-backend
-pm2 save
-pm2 startup   # follow the printed command so it survives reboots
+chmod +x deploy.sh      # first time only
+./deploy.sh             # pull → pnpm install → pm2 startOrReload → health-check
+pm2 startup             # first time only: follow the printed command so it survives reboots
 ```
-Verify: `curl http://localhost:4000/health` → `{"ok":true}`.
+Re-run `./deploy.sh` any time to ship an update (zero-downtime reload).
+
+**Endpoints to verify:**
+- `curl http://localhost:4000/health` → `{"ok":true}`
+- `curl http://localhost:4000/status` → `{ ok, store: "mongo"|"memory", uptimeSeconds, ... }`
+  (use `/status` for uptime monitoring — `store` confirms Mongo is connected).
 
 ## 5. HTTPS (required — the browser blocks https-page → http-API calls)
 Put the backend behind nginx on a subdomain (e.g. `api.yourdomain.com`) with a

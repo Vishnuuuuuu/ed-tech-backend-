@@ -1,8 +1,10 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { initStore } from "./store/index.js";
+import { initStore, getStore } from "./store/index.js";
 import { apiRouter, uploadErrorHandler } from "./routes/api.js";
+
+const BOOT_AT = Date.now();
 
 async function main() {
   await initStore();
@@ -34,6 +36,19 @@ async function main() {
 
   app.get("/health", (_req, res) => {
     res.json({ ok: true });
+  });
+
+  // Richer status for monitoring / pm2 / uptime checks.
+  app.get("/status", (_req, res) => {
+    res.json({
+      ok: true,
+      service: "slp-backend",
+      store: getStore().kind, // "mongo" | "memory"
+      uptimeSeconds: Math.round(process.uptime()),
+      bootedAt: new Date(BOOT_AT).toISOString(),
+      now: new Date().toISOString(),
+      node: process.version,
+    });
   });
 
   app.use(apiRouter);
