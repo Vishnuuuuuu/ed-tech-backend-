@@ -1,0 +1,4 @@
+# Normalize line endings to LF in the repo so shell scripts and configs run
+# correctly on the Linux VPS regardless of the committer's OS.
+* text=auto eol=lf
+*.sh text eol=lf
